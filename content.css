@@ -1,0 +1,83 @@
+html.ext-yt-vfs {
+  --ext-yt-vfs-z-index: 2147483647;
+  --ext-yt-vfs-background: #000;
+}
+
+html.ext-yt-vfs,
+html.ext-yt-vfs body {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/*
+  Main fullscreen anchor.
+  This is the single box we promote into a viewport-sized fixed layer.
+*/
+html.ext-yt-vfs #player-container {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: var(--ext-yt-vfs-background) !important;
+  box-sizing: border-box !important;
+  z-index: var(--ext-yt-vfs-z-index) !important;
+}
+
+/*
+  Stable inner player chain.
+  These wrappers must stretch to fully occupy #player-container.
+*/
+html.ext-yt-vfs #player-container > ytd-player,
+html.ext-yt-vfs #player-container > ytd-player > #container,
+html.ext-yt-vfs #player-container #movie_player,
+html.ext-yt-vfs #player-container .html5-video-player,
+html.ext-yt-vfs #player-container .html5-video-container {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/*
+  Actual media element.
+  `object-fit: contain` preserves the full video without cropping.
+*/
+html.ext-yt-vfs #player-container video,
+html.ext-yt-vfs #player-container video.video-stream,
+html.ext-yt-vfs #player-container .video-stream.html5-main-video {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  object-fit: contain !important;
+  background: var(--ext-yt-vfs-background) !important;
+}
+
+/*
+  Keep the promoted player layer self-contained.
+  This reduces the chance of page content peeking through the player box.
+*/
+html.ext-yt-vfs #player-container,
+html.ext-yt-vfs #player-container > ytd-player,
+html.ext-yt-vfs #player-container > ytd-player > #container,
+html.ext-yt-vfs #player-container #movie_player {
+  overflow: hidden !important;
+}
