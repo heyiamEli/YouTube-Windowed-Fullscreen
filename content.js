@@ -96,7 +96,7 @@
   function toggleMode() {
     if (!isWatchPage()) return;
 
-    if (document.documentElement.classList.contains(ROOT_CLASS)) {
+    if (isModeOn()) {
       disableMode();
     } else {
       enterMode();
