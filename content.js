@@ -24,7 +24,7 @@
   }
 
   function isNativeTheaterButton(element) {
-    return !!element.closest('.ytp-size-button') && !isOurButton(element);
+    return !!element.closest('.ytp-size-button');
   }
 
   function isNativeFullscreenButton(element) {
@@ -51,7 +51,7 @@
 
   function getNativeTheaterButton() {
     return document.querySelector(
-      '.ytp-right-controls-right .ytp-size-button:not(.ext-yt-vfs-button)'
+      '.ytp-right-controls-right .ytp-size-button'
     );
   }
 
@@ -114,7 +114,7 @@
 
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'ytp-button ytp-size-button ext-yt-vfs-button';
+    button.className = 'ytp-button ext-yt-vfs-button';
     button.dataset.extYtVfsButton = 'true';
     button.innerHTML = ICON_SVG;
 
