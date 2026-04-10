@@ -130,17 +130,17 @@
 
   function init() {
     setTimeout(injectButton, 300);
-    document.addEventListener(
-  'click',
-  (event) => {
-    if (!isModeOn()) return;
 
-    if (isNativeTheaterButton(event.target) || isNativeFullscreenButton(event.target)) {
-      disableMode();
-    }
-  },
-  true
+    document.addEventListener('click',(event) => {
+      if (!isModeOn()) return;
+
+      if (isNativeTheaterButton(event.target) || isNativeFullscreenButton(event.target)) {
+        disableMode();
+      }
+    },
+    true
   );
+  
   document.addEventListener('fullscreenchange', () => {
   if (isModeOn() && document.fullscreenElement) {
     disableMode();
