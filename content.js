@@ -18,19 +18,6 @@
   function isModeOn() {
     return document.documentElement.classList.contains(ROOT_CLASS);
   }
-
-  function isOurButton(element) {
-    return !!element.closest('.ext-yt-vfs-button');
-  }
-
-  function isNativeTheaterButton(element) {
-    return !!element.closest('.ytp-size-button');
-  }
-
-  function isNativeFullscreenButton(element) {
-    return !!element.closest('.ytp-fullscreen-button');
-  }
-
   function syncButton(button) {
     if (!button) return;
 
@@ -128,18 +115,25 @@
     syncButton(button);
   }
 
-  function init() {
-    setTimeout(injectButton, 300);
+  function observeTheaterMode() {
+    const watchFlexy = document.querySelector('ytd-watch-flexy');
+    if (!watchFlexy) return;
 
-    document.addEventListener('click',(event) => {
-      if (!isModeOn()) return;
-
-      if (isNativeTheaterButton(event.target) || isNativeFullscreenButton(event.target)) {
+    const observer = new MutationObserver(() => {
+      if (isModeOn() && isTheaterModeOn()) {
         disableMode();
       }
-    },
-    true
-  );
+    });
+
+    observer.observe(watchFlexy, {
+      attributes: true,
+      attributeFilter: ['theater']
+  });
+  }
+
+  function init() {
+    setTimeout(injectButton, 300);
+    observeTheaterMode();
   
   document.addEventListener('fullscreenchange', () => {
   if (isModeOn() && document.fullscreenElement) {
