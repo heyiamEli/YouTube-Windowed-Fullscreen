@@ -163,4 +163,4 @@ if (document.readyState === 'loading') {
 }
 
 document.addEventListener('yt-navigate-finish', init);
-  })
+})
