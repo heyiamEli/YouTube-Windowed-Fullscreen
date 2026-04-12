@@ -131,22 +131,35 @@
   });
   }
 
-  function init() {
-    setTimeout(injectButton, 300);
-    observeTheaterMode();
-  
-  document.addEventListener('fullscreenchange', () => {
-  if (isModeOn() && document.fullscreenElement) {
-    disableMode();
-  }
+  function observeFullscreen() {
+    const moviePlayer = document.querySelector('#movie_player');
+    if (!moviePlayer) return;
+
+    const observer = new MutationObserver(() => {
+      if (isModeOn() && moviePlayer.classList.contains('ytp-fullscreen')) {
+        disableMode();
+      }
+    });
+
+    observer.observe(moviePlayer, {
+      attributes: true,
+      attributeFilter: ['class']
   });
-  }
+}
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
+function setupOnce() {
+  observeTheaterMode();
+  observeFullscreen();
+}
+function init() {
+  setTimeout(injectButton, 300);
+}
 
-  document.addEventListener('yt-navigate-finish', init);
-})();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {setupOnce();init();}, { once: true });
+} else {
+  setupOnce();
+  init();
+}
+
+document.addEventListener('yt-navigate-finish', init);
