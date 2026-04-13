@@ -1,7 +1,6 @@
 (() => {
   'use strict';
 
-
   const ROOT_CLASS = 'ext-yt-vfs';
   const BUTTON_SELECTOR = '[data-ext-yt-vfs-button="true"]';
 
@@ -12,16 +11,19 @@
       <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
     </svg>
   `;
+
   function isWatchPage() {
     return location.hostname === 'www.youtube.com' && location.pathname === '/watch';
   }
+
   function isModeOn() {
     return document.documentElement.classList.contains(ROOT_CLASS);
   }
+
   function syncButton(button) {
     if (!button) return;
 
-    const enabled = document.documentElement.classList.contains(ROOT_CLASS);
+    const enabled = isModeOn();
     const label = enabled ? 'Exit viewport fullscreen' : 'Viewport fullscreen';
 
     button.setAttribute('title', label);
@@ -34,6 +36,10 @@
 
   function isTheaterModeOn() {
     return !!document.querySelector('ytd-watch-flexy[theater]');
+  }
+
+  function isNativeFullscreenOn() {
+    return !!document.fullscreenElement;
   }
 
   function getNativeTheaterButton() {
@@ -61,19 +67,27 @@
   }
 
   function enterMode() {
+    if (isNativeFullscreenOn()) {
+      document.exitFullscreen().then(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            enableMode();
+          });
+        });
+      });
+      return;
+    }
+
     if (isTheaterModeOn()) {
       const theaterButton = getNativeTheaterButton();
-
       if (theaterButton) {
         theaterButton.click();
       }
-
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           enableMode();
         });
       });
-
       return;
     }
 
@@ -92,7 +106,7 @@
 
   function injectButton() {
     if (!isWatchPage()) return;
-    
+
     const controls = document.querySelector('.ytp-right-controls-right');
     const fullscreenButton = document.querySelector('.ytp-fullscreen-button');
 
@@ -115,10 +129,7 @@
     syncButton(button);
   }
 
-  function observeTheaterMode() {
-    const watchFlexy = document.querySelector('ytd-watch-flexy');
-    if (!watchFlexy) return;
-
+  function observeTheaterMode(watchFlexy) {
     const observer = new MutationObserver(() => {
       if (isModeOn() && isTheaterModeOn()) {
         disableMode();
@@ -128,13 +139,10 @@
     observer.observe(watchFlexy, {
       attributes: true,
       attributeFilter: ['theater']
-  });
+    });
   }
 
-  function observeFullscreen() {
-    const moviePlayer = document.querySelector('#movie_player');
-    if (!moviePlayer) return;
-
+  function observeFullscreen(moviePlayer) {
     const observer = new MutationObserver(() => {
       if (isModeOn() && moviePlayer.classList.contains('ytp-fullscreen')) {
         disableMode();
@@ -144,23 +152,60 @@
     observer.observe(moviePlayer, {
       attributes: true,
       attributeFilter: ['class']
-  });
-}
+    });
+  }
 
-function setupOnce() {
-  observeTheaterMode();
-  observeFullscreen();
-}
-function init() {
-  setTimeout(injectButton, 300);
-}
+  function observeFullscreenClick() {
+    document.addEventListener('click', (event) => {
+      if (!isModeOn()) return;
+      if (event.target.closest('.ytp-fullscreen-button')) {
+        disableMode();
+      }
+    }, true);
+  }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {setupOnce();init();}, { once: true });
-} else {
-  setupOnce();
-  init();
-}
+  function observeFullscreenKey() {
+    document.addEventListener('keydown', (event) => {
+      if (!isModeOn()) return;
 
-document.addEventListener('yt-navigate-finish', init);
-})
+      const tag = document.activeElement?.tagName;
+      const isTyping =
+        tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable;
+      if (isTyping) return;
+
+      if (event.key.toLowerCase() === 'f') {
+        disableMode();
+      }
+    }, true);
+  }
+
+  let observersReady = false;
+
+  function setupOnce() {
+    if (observersReady) return;
+
+    const watchFlexy = document.querySelector('ytd-watch-flexy');
+    const moviePlayer = document.querySelector('#movie_player');
+
+    if (!watchFlexy || !moviePlayer) return;
+
+    observeTheaterMode(watchFlexy);
+    observeFullscreen(moviePlayer);
+    observeFullscreenKey();
+    observeFullscreenClick();
+    observersReady = true;
+  }
+
+  function init() {
+    setupOnce();
+    setTimeout(injectButton, 300);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+
+  document.addEventListener('yt-navigate-finish', init);
+})();
