@@ -79,15 +79,11 @@
     }
 
     if (isTheaterModeOn()) {
+      enableMode();
       const theaterButton = getNativeTheaterButton();
       if (theaterButton) {
         theaterButton.click();
       }
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          enableMode();
-        });
-      });
       return;
     }
 

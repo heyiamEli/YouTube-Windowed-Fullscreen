@@ -81,3 +81,9 @@ html.ext-yt-vfs #player-container > ytd-player > #container,
 html.ext-yt-vfs #player-container #movie_player {
   overflow: hidden !important;
 }
+
+html.ext-yt-vfs #secondary,
+html.ext-yt-vfs #below,
+html.ext-yt-vfs #masthead-container{
+  display: none !important;
+}
