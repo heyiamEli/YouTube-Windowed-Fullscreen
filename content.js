@@ -160,21 +160,22 @@
     }, true);
   }
 
-  function observeFullscreenKey() {
+  function observeHotkeys() {
     document.addEventListener('keydown', (event) => {
-      if (!isModeOn()) return;
-
       const tag = document.activeElement?.tagName;
       const isTyping =
         tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable;
       if (isTyping) return;
 
-      if (event.key.toLowerCase() === 'f') {
+      if (event.key === '`') {
+        toggleMode();
+      }
+
+      if (event.key.toLowerCase() === 'f' && isModeOn()) {
         disableMode();
       }
     }, true);
   }
-
   let observersReady = false;
 
   function setupOnce() {
@@ -187,7 +188,7 @@
 
     observeTheaterMode(watchFlexy);
     observeFullscreen(moviePlayer);
-    observeFullscreenKey();
+    observeHotkeys()
     observeFullscreenClick();
     observersReady = true;
   }
