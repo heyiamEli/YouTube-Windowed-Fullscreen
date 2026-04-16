@@ -1,8 +1,12 @@
 (() => {
   'use strict';
+  
+
 
   const ROOT_CLASS = 'ext-yt-vfs';
   const BUTTON_SELECTOR = '[data-ext-yt-vfs-button="true"]';
+  let customShortcut = '`';
+
 
   const ICON_SVG = `
     <svg height="24" viewBox="0 0 24 24" width="24" fill="none" stroke="currentColor"><path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
@@ -167,7 +171,7 @@
         tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable;
       if (isTyping) return;
 
-      if (event.key === '`') {
+      if (event.key === customShortcut) {
         toggleMode();
       }
 
@@ -176,8 +180,41 @@
       }
     }, true);
   }
-  let observersReady = false;
+  
+  // communication with popup for toggleing from there and updating button state
+  function setupMessageListener() {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'getState') {
+        sendResponse({ isOn: isModeOn() });
+      }
 
+      if (message.action === 'toggle') {
+        toggleMode();
+        sendResponse({ isOn: isModeOn() });
+      }
+
+      return true;
+    });
+  }
+
+    function loadShortcut() {
+    chrome.storage.sync.get('shortcut', (result) => {
+      if (result.shortcut) {
+        customShortcut = result.shortcut;
+      }
+    });
+  }
+
+  function watchShortcutChanges() {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === 'sync' && changes.shortcut) {
+        customShortcut = changes.shortcut.newValue;
+      }
+    });
+  }
+
+
+  let observersReady = false;
   function setupOnce() {
     if (observersReady) return;
 
@@ -190,8 +227,10 @@
     observeFullscreen(moviePlayer);
     observeHotkeys()
     observeFullscreenClick();
+    setupMessageListener(); 
     observersReady = true;
   }
+
 
   function init() {
     setupOnce();
@@ -199,8 +238,14 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
+    document.addEventListener('DOMContentLoaded', () => {
+      loadShortcut();
+      watchShortcutChanges();
+      init();
+    }, { once: true });
   } else {
+    loadShortcut();
+    watchShortcutChanges();
     init();
   }
 
