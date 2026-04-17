@@ -180,24 +180,7 @@
       }
     }, true);
   }
-  
-  // communication with popup for toggleing from there and updating button state
-  function setupMessageListener() {
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === 'getState') {
-        sendResponse({ isOn: isModeOn() });
-      }
-
-      if (message.action === 'toggle') {
-        toggleMode();
-        sendResponse({ isOn: isModeOn() });
-      }
-
-      return true;
-    });
-  }
-
-    function loadShortcut() {
+  function loadShortcut() {
     chrome.storage.sync.get('shortcut', (result) => {
       if (result.shortcut) {
         customShortcut = result.shortcut;
@@ -227,7 +210,6 @@
     observeFullscreen(moviePlayer);
     observeHotkeys()
     observeFullscreenClick();
-    setupMessageListener(); 
     observersReady = true;
   }
 
