@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="pop.css" />
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="pop.css" />
   </head>
   <body>
-    <h2>YouTube Viewport Fullscreen</h2>
+    <main class="popup-shell">
+      <header class="popup-header">
+        <p class="eyebrow">YouTube extension</p>
+        <h1>YouTube Viewport Fullscreen</h1>
+        <p class="subtitle">Set a custom keyboard shortcut for instant viewport fullscreen.</p>
+      </header>
 
-    <div class="row">
-      <label>Keyboard shortcut</label>
-      <input
-        class="shortcut-input"
-        id="shortcut-input"
-        readonly
-        placeholder="Press a key..."
-      />
-      <p class="hint">Click the box, then press any key to assign it.</p>
-      <p class="warning" id="shortcut-warning"></p>
-    </div>
+      <section class="shortcut-card">
+        <label for="shortcut-input">Keyboard shortcut</label>
+        <input
+          class="shortcut-input"
+          id="shortcut-input"
+          readonly
+          placeholder="Press a key..."
+        />
+        <p class="hint">Click the field and press any non-reserved key to save.</p>
+        <p class="warning" id="shortcut-warning"></p>
+      </section>
+    </main>
 
     <script src="popup.js"></script>
   </body>
