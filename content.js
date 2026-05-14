@@ -164,6 +164,16 @@
     }, true);
   }
 
+  function observeFullscreenDoubleClick() {
+    document.addEventListener('dblclick', (event) => {
+      if (!isModeOn()) return;
+      if (!(event.target instanceof Element)) return;
+      if (event.target.closest('#movie_player')) {
+        disableMode();
+      }
+    }, true);
+  }
+
   function observeHotkeys() {
     document.addEventListener('keydown', (event) => {
       const tag = document.activeElement?.tagName;
@@ -208,8 +218,9 @@
 
     observeTheaterMode(watchFlexy);
     observeFullscreen(moviePlayer);
-    observeHotkeys()
+    observeHotkeys();
     observeFullscreenClick();
+    observeFullscreenDoubleClick();
     observersReady = true;
   }
 
