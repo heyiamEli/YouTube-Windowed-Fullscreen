@@ -53,6 +53,8 @@
   }
 
   function enableMode() {
+    if (!isWatchPage()) return;
+
     document.documentElement.classList.add(ROOT_CLASS);
 
     const button = document.querySelector(BUTTON_SELECTOR);
@@ -68,6 +70,17 @@
     syncButton(button);
 
     notifyResize();
+  }
+
+  function disableModeOutsideWatchPage() {
+    if (!isWatchPage() && isModeOn()) {
+      disableMode();
+    }
+  }
+
+  function scheduleRouteCleanup() {
+    disableModeOutsideWatchPage();
+    requestAnimationFrame(disableModeOutsideWatchPage);
   }
 
   function enterMode() {
@@ -226,8 +239,14 @@
 
 
   function init() {
+    disableModeOutsideWatchPage();
+    if (!isWatchPage()) return;
+
     setupOnce();
-    setTimeout(injectButton, 300);
+    setTimeout(() => {
+      disableModeOutsideWatchPage();
+      injectButton();
+    }, 300);
   }
 
   if (document.readyState === 'loading') {
@@ -242,5 +261,7 @@
     init();
   }
 
+  window.addEventListener('popstate', scheduleRouteCleanup);
+  document.addEventListener('yt-navigate-start', scheduleRouteCleanup);
   document.addEventListener('yt-navigate-finish', init);
 })();
